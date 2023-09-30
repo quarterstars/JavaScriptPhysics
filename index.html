@@ -9,10 +9,10 @@
   </head>
   <body>
     <label for="gravityInput">Gravity:</label>
-    <input type="number" id="gravityInput" value="0.5" min="0.1" />
+    <input type="number" id="gravityInput" value="0.5" min="0.3" />
     <br />
-    <label for="speedInput">Speed:</label>
-    <input type="number" id="speedInput" value="5" min="1" />
+    <label for="massInput">Mass:</label>
+    <input type="number" id="massInput" value="1" min="0.5" />
     <br />
     <canvas id="gameCanvas" width="800" height="400"></canvas>
     <script>
@@ -27,9 +27,10 @@
         height: 30,
         velocityX: 0,
         velocityY: 0,
-        speed: parseFloat(document.getElementById("speedInput").value),
+        speed: 5,
         jumpStrength: 10,
         isJumping: false,
+        mass: parseFloat(document.getElementById("massInput").value),
       };
 
       let gravity = parseFloat(document.getElementById("gravityInput").value);
@@ -65,7 +66,7 @@
 
       function update() {
         // Apply gravity
-        player.velocityY += gravity;
+        player.velocityY += gravity * player.mass;
 
         // Update player position
         player.x += player.velocityX;
@@ -122,9 +123,9 @@
         gravity = parseFloat(document.getElementById("gravityInput").value);
       });
 
-      // Update speed when the input changes
-      document.getElementById("speedInput").addEventListener("input", () => {
-        player.speed = parseFloat(document.getElementById("speedInput").value);
+      // Update mass when the input changes
+      document.getElementById("massInput").addEventListener("input", () => {
+        player.mass = parseFloat(document.getElementById("massInput").value);
       });
 
       // Start the game loop
