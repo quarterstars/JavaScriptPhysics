@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      canvas {
+        border: 2px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <label for="gravityInput">Gravity:</label>
+    <input type="number" id="gravityInput" value="0.5" />
+    <br />
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <script>
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+
+      // Player properties
+      const player = {
+        x: 50,
+        y: canvas.height - 50,
+        width: 30,
+        height: 30,
+        velocityX: 0,
+        velocityY: 0,
+        speed: 5,
+        jumpStrength: 10,
+        isJumping: false,
+      };
+
+      let gravity = parseFloat(document.getElementById("gravityInput").value);
+
+      // Platform properties
+      const platforms = [
+        { x: 0, y: canvas.height - 10, width: canvas.width, height: 10 },
+        { x: 200, y: 300, width: 150, height: 10 },
+        { x: 400, y: 200, width: 150, height: 10 },
+        { x: 600, y: 100, width: 150, height: 10 },
+      ];
+
+      function drawPlayer() {
+        ctx.fillStyle = "blue";
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+      }
+
+      function drawPlatforms() {
+        ctx.fillStyle = "green";
+        platforms.forEach((platform) => {
+          ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+        });
+      }
+
+      function checkCollision(object, platform) {
+        return (
+          object.x < platform.x + platform.width &&
+          object.x + object.width > platform.x &&
+          object.y < platform.y + platform.height &&
+          object.y + object.height > platform.y
+        );
+      }
+
+      function update() {
+        // Apply gravity
+        player.velocityY += gravity;
+
+        // Update player position
+        player.x += player.velocityX;
+        player.y += player.velocityY;
+
+        // Check for collisions with platforms
+        platforms.forEach((platform) => {
+          if (checkCollision(player, platform)) {
+            // Reset player position when colliding with a platform
+            player.velocityY = 0;
+            player.isJumping = false;
+            player.y = platform.y - player.height;
+          }
+        });
+
+        // Keep the player within the canvas bounds
+        if (player.x < 0) {
+          player.x = 0;
+        }
+        if (player.x + player.width > canvas.width) {
+          player.x = canvas.width - player.width;
+        }
+
+        // Clear the canvas and redraw
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawPlayer();
+        drawPlatforms();
+
+        requestAnimationFrame(update);
+      }
+
+      // Handle keyboard input
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowLeft") {
+          player.velocityX = -player.speed;
+        }
+        if (event.key === "ArrowRight") {
+          player.velocityX = player.speed;
+        }
+        if (event.key === "ArrowUp" && !player.isJumping) {
+          player.velocityY = -player.jumpStrength;
+          player.isJumping = true;
+        }
+      });
+
+      document.addEventListener("keyup", (event) => {
+        if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+          player.velocityX = 0;
+        }
+      });
+
+      // Update gravity when the input changes
+      document.getElementById("gravityInput").addEventListener("input", () => {
+        gravity = parseFloat(document.getElementById("gravityInput").value);
+      });
+
+      // Start the game loop
+      update();
+    </script>
+  </body>
+</html>
