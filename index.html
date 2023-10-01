@@ -8,124 +8,92 @@
     </style>
   </head>
   <body>
-    <label for="gravityInput">Gravity:</label>
-    <input type="number" id="gravityInput" value="0.5" min="0.3" />
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <p>Click Space Bar to jump</p>
+    <label for="forceInput">Gravity:</label>
+    <input type="number" id="forceInput" value="0.1" />
     <br />
     <label for="massInput">Mass:</label>
-    <input type="number" id="massInput" value="1" min="0.5" />
-    <br />
-    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <input type="number" id="massInput" value="1" />
+
     <script>
       const canvas = document.getElementById("gameCanvas");
       const ctx = canvas.getContext("2d");
 
-      // Player properties
-      const player = {
-        x: 50,
-        y: canvas.height - 50,
-        width: 30,
-        height: 30,
-        velocityX: 0,
-        velocityY: 0,
-        speed: 5,
-        jumpStrength: 10,
-        isJumping: false,
+      // Ball properties
+      const ball = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        radius: 20,
+        velocityX: 2,
+        velocityY: 0, // Initialize vertical velocity to 0
+        color: "blue",
         mass: parseFloat(document.getElementById("massInput").value),
       };
 
-      let gravity = parseFloat(document.getElementById("gravityInput").value);
+      // Ground properties
+      const ground = {
+        y: canvas.height - 20, // Adjust the ground position as needed
+      };
 
-      // Platform properties
-      const platforms = [
-        { x: 0, y: canvas.height - 10, width: canvas.width, height: 10 },
-        { x: 200, y: 300, width: 150, height: 10 },
-        { x: 400, y: 200, width: 150, height: 10 },
-        { x: 600, y: 100, width: 150, height: 10 },
-      ];
+      // Gravity
+      let gravity = parseFloat(document.getElementById("forceInput").value);
 
-      function drawPlayer() {
-        ctx.fillStyle = "blue";
-        ctx.fillRect(player.x, player.y, player.width, player.height);
-      }
+      // Flag to track if the spacebar is pressed
+      let isJumping = false;
 
-      function drawPlatforms() {
-        ctx.fillStyle = "green";
-        platforms.forEach((platform) => {
-          ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
-        });
-      }
-
-      function checkCollision(object, platform) {
-        return (
-          object.x < platform.x + platform.width &&
-          object.x + object.width > platform.x &&
-          object.y < platform.y + platform.height &&
-          object.y + object.height > platform.y
-        );
+      function drawBall() {
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        ctx.fillStyle = ball.color;
+        ctx.fill();
+        ctx.closePath();
       }
 
       function update() {
         // Apply gravity
-        player.velocityY += gravity * player.mass;
+        ball.velocityY += gravity * ball.mass;
 
-        // Update player position
-        player.x += player.velocityX;
-        player.y += player.velocityY;
+        // Update ball position
+        ball.x += ball.velocityX;
+        ball.y += ball.velocityY;
 
-        // Check for collisions with platforms
-        platforms.forEach((platform) => {
-          if (checkCollision(player, platform)) {
-            // Reset player position when colliding with a platform
-            player.velocityY = 0;
-            player.isJumping = false;
-            player.y = platform.y - player.height;
-          }
-        });
-
-        // Keep the player within the canvas bounds
-        if (player.x < 0) {
-          player.x = 0;
+        // Bounce off the walls
+        if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
+          ball.velocityX *= -1;
         }
-        if (player.x + player.width > canvas.width) {
-          player.x = canvas.width - player.width;
+
+        // Bounce off the floor
+        if (ball.y + ball.radius > ground.y) {
+          ball.velocityY *= -1;
+          ball.y = ground.y - ball.radius; // Set the ball on top of the ground
+          isJumping = false; // Reset the jump flag when the ball touches the ground
         }
 
         // Clear the canvas and redraw
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawPlayer();
-        drawPlatforms();
+        drawBall();
 
         requestAnimationFrame(update);
       }
 
-      // Handle keyboard input
-      document.addEventListener("keydown", (event) => {
-        if (event.key === "ArrowLeft") {
-          player.velocityX = -player.speed;
-        }
-        if (event.key === "ArrowRight") {
-          player.velocityX = player.speed;
-        }
-        if (event.key === "ArrowUp" && !player.isJumping) {
-          player.velocityY = -player.jumpStrength;
-          player.isJumping = true;
-        }
+      // Handle input changes
+      document.getElementById("forceInput").addEventListener("input", () => {
+        gravity = parseFloat(document.getElementById("forceInput").value);
       });
 
-      document.addEventListener("keyup", (event) => {
-        if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-          player.velocityX = 0;
-        }
-      });
-
-      // Update gravity when the input changes
-      document.getElementById("gravityInput").addEventListener("input", () => {
-        gravity = parseFloat(document.getElementById("gravityInput").value);
-      });
-
-      // Update mass when the input changes
       document.getElementById("massInput").addEventListener("input", () => {
-        player.mass = parseFloat(document.getElementById("massInput").value);
+        ball.mass = parseFloat(document.getElementById("massInput").value);
+      });
+
+      // Event listener for the spacebar key
+      document.addEventListener("keydown", (event) => {
+        if (event.key === " ") {
+          if (!isJumping) {
+            ball.velocityY = -10; // Apply an upward velocity when jumping
+            isJumping = true; // Set the jump flag to true
+          }
+        }
       });
 
       // Start the game loop
