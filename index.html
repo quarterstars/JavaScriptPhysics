@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      canvas {
+        border: 2px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <p>Click Space Bar to jump</p>
+    <label for="forceInput">Gravity:</label>
+    <input type="number" id="forceInput" value="0.1" />
+    <br />
+    <label for="massInput">Mass:</label>
+    <input type="number" id="massInput" value="1" />
+<a href="index1.html"></a>
+    <script>
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+
+      // Ball properties
+      const ball = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        radius: 20,
+        velocityX: 2,
+        velocityY: 0, // Initialize vertical velocity to 0
+        color: "blue",
+        mass: parseFloat(document.getElementById("massInput").value),
+      };
+
+      // Ground properties
+      const ground = {
+        y: canvas.height - 20, // Adjust the ground position as needed
+      };
+
+      // Gravity
+      let gravity = parseFloat(document.getElementById("forceInput").value);
+
+      // Flag to track if the spacebar is pressed
+      let isJumping = false;
+
+      function drawBall() {
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        ctx.fillStyle = ball.color;
+        ctx.fill();
+        ctx.closePath();
+      }
+
+      function update() {
+        // Apply gravity
+        ball.velocityY += gravity * ball.mass;
+
+        // Update ball position
+        ball.x += ball.velocityX;
+        ball.y += ball.velocityY;
+
+        // Bounce off the walls
+        if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
+          ball.velocityX *= -1;
+        }
+
+        // Bounce off the floor
+        if (ball.y + ball.radius > ground.y) {
+          ball.velocityY *= -1;
+          ball.y = ground.y - ball.radius; // Set the ball on top of the ground
+          isJumping = false; // Reset the jump flag when the ball touches the ground
+        }
+
+        // Clear the canvas and redraw
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBall();
+
+        requestAnimationFrame(update);
+      }
+
+      // Handle input changes
+      document.getElementById("forceInput").addEventListener("input", () => {
+        gravity = parseFloat(document.getElementById("forceInput").value);
+      });
+
+      document.getElementById("massInput").addEventListener("input", () => {
+        ball.mass = parseFloat(document.getElementById("massInput").value);
+      });
+
+      // Event listener for the spacebar key
+      document.addEventListener("keydown", (event) => {
+        if (event.key === " ") {
+          if (!isJumping) {
+            ball.velocityY = -10; // Apply an upward velocity when jumping
+            isJumping = true; // Set the jump flag to true
+          }
+        }
+      });
+
+      // Start the game loop
+      update();
+    </script>
+  </body>
+</html>
