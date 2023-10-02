@@ -28,8 +28,8 @@
         velocityX: 0,
         velocityY: 0,
         speed: 5,
-        jumpStrength: 100,
-        isJumping: true,
+        jumpStrength: 10,
+        isJumping: false,
         mass: parseFloat(document.getElementById("massInput").value),
       };
 
@@ -56,12 +56,12 @@
       }
 
       function checkCollision(object, platform) {
-        return (
-          object.x < platform.x + platform.width &&
-          object.x + object.width > platform.x &&
-          object.y < platform.y + platform.height &&
-          object.y + object.height > platform.y
-        );
+        const topCollision = object.y < platform.y + platform.height;
+        const bottomCollision = object.y + object.height > platform.y;
+        const leftCollision = object.x + object.width > platform.x;
+        const rightCollision = object.x < platform.x + platform.width;
+
+        return topCollision && bottomCollision && leftCollision && rightCollision;
       }
 
       function update() {
@@ -88,6 +88,13 @@
         }
         if (player.x + player.width > canvas.width) {
           player.x = canvas.width - player.width;
+        }
+        if (player.y < 0) {
+          player.y = 0;
+          player.velocityY = 0; // Prevent player from jumping out of the canvas
+        }
+        if (player.y + player.height > canvas.height) {
+          player.y = canvas.height - player.height;
         }
 
         // Clear the canvas and redraw
