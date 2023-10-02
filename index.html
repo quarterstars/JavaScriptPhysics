@@ -1,20 +1,134 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Physics - Second Law of Motion</title>
     <style>
-      canvas {
-        border: 2px solid black;
+      /* Reset some default styles */
+      body,
+      h1,
+      h2,
+      p,
+      ul,
+      li {
+        margin: 0;
+        padding: 0;
       }
+
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f7f7f7;
+      }
+
+      /* Header Styles */
+      header {
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        padding: 1rem 0;
+      }
+
+      header h1 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+
+      /* Navigation Styles */
+      nav {
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        padding: 1rem 0;
+      }
+
+      nav ul {
+        list-style-type: none;
+      }
+
+      nav ul li {
+        display: inline;
+        margin-right: 20px;
+      }
+
+      nav ul li a {
+        text-decoration: none;
+        color: #fff;
+        font-weight: bold;
+        font-size: 1.2rem;
+      }
+
+      /* Main Content Styles */
+      main {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
+      }
+
+      main h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+
+      main p {
+        font-size: 1.2rem;
+        line-height: 1.4;
+      }
+
+      /* Footer Styles */
+      footer {
+        text-align: center;
+        background-color: #333;
+        color: #fff;
+        padding: 1rem 0;
+      }
+
+      /* Add more custom styling as needed */
     </style>
   </head>
   <body>
-    <label for="gravityInput">Gravity:</label>
-    <input type="number" id="gravityInput" value="0.5" min="0.3" />
-    <br />
-    <label for="massInput">Mass:</label>
-    <input type="number" id="massInput" value="1" min="0.5" />
-    <br />
-    <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <header>
+      <h1>Physics - Second Law of Motion</h1>
+    </header>
+    <nav>
+      <ul>
+        <li><a href="#second-law">Second Law of Motion</a></li>
+        <li><a href="#game1">Game 1</a></li>
+        <li><a href="#game2">Game 2</a></li>
+      </ul>
+    </nav>
+    <main>
+      <section id="second-law">
+        <h2>The Second Law of Motion</h2>
+        <p>
+          The second law of motion states that the force acting on an object is
+          equal to the mass of that object times its acceleration:
+          <strong>F = ma</strong>
+        </p>
+        <!-- Add more content about the second law -->
+      </section>
+      <section id="game1">
+        <h2>Game 1 - Replace with Your Game Code</h2>
+        <label for="gravityInput">Gravity:</label>
+        <input type="number" id="gravityInput" value="0.5" min="0.3" />
+        <br />
+        <label for="massInput">Mass:</label>
+        <input type="number" id="massInput" value="1" min="0.5" />
+        <br />
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+      </section>
+      <section id="game2">
+        <h2>Game 2 - Replace with Your Game Code</h2>
+        <!-- Replace this with your game code -->
+      </section>
+    </main>
+    <footer>
+      <p>&copy; 2023 Your Name</p>
+    </footer>
     <script>
       const canvas = document.getElementById("gameCanvas");
       const ctx = canvas.getContext("2d");
@@ -28,7 +142,7 @@
         velocityX: 0,
         velocityY: 0,
         speed: 5,
-        jumpStrength: 1,
+        jumpStrength: 10,
         isJumping: false,
         mass: parseFloat(document.getElementById("massInput").value),
       };
@@ -56,12 +170,12 @@
       }
 
       function checkCollision(object, platform) {
-        const topCollision = object.y < platform.y + platform.height;
-        const bottomCollision = object.y + object.height > platform.y;
-        const leftCollision = object.x + object.width > platform.x;
-        const rightCollision = object.x < platform.x + platform.width;
-
-        return topCollision && bottomCollision && leftCollision && rightCollision;
+        return (
+          object.x < platform.x + platform.width &&
+          object.x + object.width > platform.x &&
+          object.y < platform.y + platform.height &&
+          object.y + object.height > platform.y
+        );
       }
 
       function update() {
@@ -88,13 +202,6 @@
         }
         if (player.x + player.width > canvas.width) {
           player.x = canvas.width - player.width;
-        }
-        if (player.y < 0) {
-          player.y = 0;
-          player.velocityY = 0; // Prevent player from jumping out of the canvas
-        }
-        if (player.y + player.height > canvas.height) {
-          player.y = canvas.height - player.height;
         }
 
         // Clear the canvas and redraw
